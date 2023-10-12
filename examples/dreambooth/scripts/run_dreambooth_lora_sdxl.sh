@@ -20,22 +20,23 @@ fi
 
 # 启动训练脚本
 start_time=$(date +%s)
-nohup python3 -m torch.distributed.run --nproc_per_node 8 train_text_to_image.py \
-  --pretrained_model_name_or_path CompVis/stable-diffusion-v1-4 \
-  --dataset_name lambdalabs/pokemon-blip-captions \
-  --use_ema \
-  --resolution 512 \
-  --center_crop \
-  --random_flip \
+nohup python3 -m torch.distributed.run --nproc_per_node 8 train_dreambooth_lora_sdxl.py \
+  --pretrained_model_name_or_path stabilityai/stable-diffusion-xl-base-1.0  \
+  --instance_data_dir dog \
+  --pretrained_vae_model_name_or_path madebyollin/sdxl-vae-fp16-fix \
+  --mixed_precision "fp16" \
+  --instance_prompt "a photo of sks dog" \
+  --resolution 1024 \
   --train_batch_size 1 \
   --gradient_accumulation_steps 4 \
-  --gradient_checkpointing \
-  --max_train_steps 50 \
-  --learning_rate 1e-05 \
-  --max_grad_norm 1 \
+  --learning_rate 1e-5 \
   --lr_scheduler "constant" \
   --lr_warmup_steps 0 \
-  --output_dir ./output_test_to_image > ${scripts_path_dir}/output_test_to_image/run_text_to_image.log 2>&1 &
+  --max_train_steps 500 \
+  --validation_prompt "A photo of sks dog in a bucket" \
+  --validation_epochs 25 \
+  --seed "0" \
+  --output_dir ./output_dreambooth_lora_sdxl > ${scripts_path_dir}/output_dreambooth_lora_sdxl/run_dreambooth_lora_sdxl.log 2>&1 &
 wait
 end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))

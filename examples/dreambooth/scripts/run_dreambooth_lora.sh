@@ -20,22 +20,22 @@ fi
 
 # 启动训练脚本
 start_time=$(date +%s)
-nohup python3 -m torch.distributed.run --nproc_per_node 8 train_text_to_image.py \
-  --pretrained_model_name_or_path CompVis/stable-diffusion-v1-4 \
-  --dataset_name lambdalabs/pokemon-blip-captions \
-  --use_ema \
+nohup python3 -m torch.distributed.run --nproc_per_node 8 train_dreambooth_lora.py \
+  --pretrained_model_name_or_path runwayml/stable-diffusion-v1-5 \
+  --instance_data_dir dog \
+  --instance_prompt "a photo of sks dog" \
   --resolution 512 \
-  --center_crop \
-  --random_flip \
   --train_batch_size 1 \
-  --gradient_accumulation_steps 4 \
-  --gradient_checkpointing \
-  --max_train_steps 50 \
-  --learning_rate 1e-05 \
-  --max_grad_norm 1 \
+  --gradient_accumulation_steps 1 \
+  --checkpointing_steps 100 \
+  --learning_rate 1e-4 \
   --lr_scheduler "constant" \
   --lr_warmup_steps 0 \
-  --output_dir ./output_test_to_image > ${scripts_path_dir}/output_test_to_image/run_text_to_image.log 2>&1 &
+  --max_train_steps 500 \
+  --validation_prompt "A photo of sks dog in a bucket" \
+  --validation_epochs 50 \
+  --seed "0" \
+  --output_dir ./output_dreambooth_lora > ${scripts_path_dir}/output_dreambooth_lora/run_dreambooth_lora.log 2>&1 &
 wait
 end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))

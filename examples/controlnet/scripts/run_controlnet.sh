@@ -20,22 +20,17 @@ fi
 
 # 启动训练脚本
 start_time=$(date +%s)
-nohup python3 -m torch.distributed.run --nproc_per_node 8 train_text_to_image.py \
-  --pretrained_model_name_or_path CompVis/stable-diffusion-v1-4 \
-  --dataset_name lambdalabs/pokemon-blip-captions \
-  --use_ema \
+nohup python3 -m torch.distributed.run --nproc_per_node 8 train_controlnet.py \
+  --pretrained_model_name_or_path runwayml/stable-diffusion-v1-5 \
+  --dataset_name fusing/fill50k \
   --resolution 512 \
-  --center_crop \
-  --random_flip \
+  --learning_rate 1e-5 \
+  --validation_image "./conditioning_image_1.png" "./conditioning_image_2.png" \
+  --validation_prompt "red circle with blue background" "cyan circle with brown floral background" \
   --train_batch_size 1 \
   --gradient_accumulation_steps 4 \
-  --gradient_checkpointing \
-  --max_train_steps 50 \
-  --learning_rate 1e-05 \
-  --max_grad_norm 1 \
-  --lr_scheduler "constant" \
-  --lr_warmup_steps 0 \
-  --output_dir ./output_test_to_image > ${scripts_path_dir}/output_test_to_image/run_text_to_image.log 2>&1 &
+  --mixed_precision="fp16" \
+  --output_dir ./output_controlnet > ${scripts_path_dir}/output_controlnet/run_controlnet.log 2>&1 &
 wait
 end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))

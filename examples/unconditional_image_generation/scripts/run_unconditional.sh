@@ -20,22 +20,19 @@ fi
 
 # 启动训练脚本
 start_time=$(date +%s)
-nohup python3 -m torch.distributed.run --nproc_per_node 8 train_text_to_image.py \
-  --pretrained_model_name_or_path CompVis/stable-diffusion-v1-4 \
-  --dataset_name lambdalabs/pokemon-blip-captions \
-  --use_ema \
-  --resolution 512 \
+nohup python3 -m torch.distributed.run --nproc_per_node 8 train_unconditional.py \
+  --dataset_name "huggan/pokemon" \
+  --resolution=64 \
   --center_crop \
   --random_flip \
-  --train_batch_size 1 \
-  --gradient_accumulation_steps 4 \
-  --gradient_checkpointing \
-  --max_train_steps 50 \
-  --learning_rate 1e-05 \
-  --max_grad_norm 1 \
-  --lr_scheduler "constant" \
-  --lr_warmup_steps 0 \
-  --output_dir ./output_test_to_image > ${scripts_path_dir}/output_test_to_image/run_text_to_image.log 2>&1 &
+  --train_batch_size 16 \
+  --num_epochs 100 \
+  --gradient_accumulation_steps 1 \
+  --use_ema \
+  --learning_rate 1e-4 \
+  --lr_warmup_steps 500 \
+  --mixed_precision "fp16" \
+  --output_dir ./output_unconditional > ${scripts_path_dir}/output_unconditional/run_unconditional.log 2>&1 &
 wait
 end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))

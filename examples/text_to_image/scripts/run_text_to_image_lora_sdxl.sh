@@ -36,7 +36,7 @@ nohup python3 -m torch.distributed.run --nproc_per_node 8 train_text_to_image_lo
   --mixed_precision="fp16" \
   --seed=42 \
   --validation_prompt="cute dragon creature" \
-  --output_dir ./output > ${scripts_path_dir}/output/run_text_to_image_lora_sdxl.log 2>&1 &
+  --output_dir ./output_text_to_image_lora_sdxl > ${scripts_path_dir}/output_text_to_image_lora_sdxl/run_text_to_image_lora_sdxl.log 2>&1 &
 wait
 end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))

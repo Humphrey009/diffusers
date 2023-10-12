@@ -20,22 +20,18 @@ fi
 
 # 启动训练脚本
 start_time=$(date +%s)
-nohup python3 -m torch.distributed.run --nproc_per_node 8 train_text_to_image.py \
-  --pretrained_model_name_or_path CompVis/stable-diffusion-v1-4 \
-  --dataset_name lambdalabs/pokemon-blip-captions \
-  --use_ema \
+nohup python3 -m torch.distributed.run --nproc_per_node 8 train_dreambooth.py \
+  --pretrained_model_name_or_path CompVis/stable-diffusion-v1-4  \
+  --instance_data_dir dog \
+  --instance_prompt "a photo of sks dog" \
   --resolution 512 \
-  --center_crop \
-  --random_flip \
   --train_batch_size 1 \
-  --gradient_accumulation_steps 4 \
-  --gradient_checkpointing \
-  --max_train_steps 50 \
-  --learning_rate 1e-05 \
-  --max_grad_norm 1 \
+  --gradient_accumulation_steps 1 \
+  --learning_rate 5e-6 \
   --lr_scheduler "constant" \
   --lr_warmup_steps 0 \
-  --output_dir ./output_test_to_image > ${scripts_path_dir}/output_test_to_image/run_text_to_image.log 2>&1 &
+  --max_train_steps 400 \
+  --output_dir ./output_dreambooth > ${scripts_path_dir}/output_dreambooth/run_dreambooth.log 2>&1 &
 wait
 end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))

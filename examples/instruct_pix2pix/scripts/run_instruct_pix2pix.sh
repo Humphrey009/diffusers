@@ -20,22 +20,25 @@ fi
 
 # 启动训练脚本
 start_time=$(date +%s)
-nohup python3 -m torch.distributed.run --nproc_per_node 8 train_text_to_image.py \
-  --pretrained_model_name_or_path CompVis/stable-diffusion-v1-4 \
-  --dataset_name lambdalabs/pokemon-blip-captions \
+nohup python3 -m torch.distributed.run --nproc_per_node 8 train_instruct_pix2pix.py \
+  --pretrained_model_name_or_path runwayml/stable-diffusion-v1-5 \
+  --dataset_name sayakpaul/instructpix2pix-1000-samples \
   --use_ema \
+  --enable_xformers_memory_efficient_attention \
   --resolution 512 \
-  --center_crop \
   --random_flip \
-  --train_batch_size 1 \
+  --train_batch_size 4 \
   --gradient_accumulation_steps 4 \
   --gradient_checkpointing \
-  --max_train_steps 50 \
-  --learning_rate 1e-05 \
-  --max_grad_norm 1 \
-  --lr_scheduler "constant" \
+  --max_train_steps 15000 \
+  --checkpointing_steps 5000 \
+  --checkpoints_total_limit 1 \
+  --learning_rate 5e-05 \
   --lr_warmup_steps 0 \
-  --output_dir ./output_test_to_image > ${scripts_path_dir}/output_test_to_image/run_text_to_image.log 2>&1 &
+  --conditioning_dropout_prob 0.05 \
+  --mixed_precision fp16 \
+  --seed 42 \
+  --output_dir ./output_instruct_pix2pix > ${scripts_path_dir}/output_instruct_pix2pix/run_instruct_pix2pix.log 2>&1 &
 wait
 end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))
