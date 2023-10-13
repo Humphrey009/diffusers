@@ -81,8 +81,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             test_args = f"""
                 unconditional_image_generation/train_unconditional.py
-                --dataset_name data/huggan/flowers-102-categories
-                
+                --dataset_name huggan/flowers-102-categories
                 --resolution=64 
                 --center_crop
                 --random_flip
