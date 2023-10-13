@@ -98,6 +98,8 @@ class ExamplesTestsAccelerate(unittest.TestCase):
 
             run_command(self._launch_args + test_args, return_stdout=True)
 
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, "unet", "diffusion_pytorch_model.safetensors")))
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, "scheduler", "scheduler_config.json")))
     def test_train_textual_inversion(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             test_args = f"""
@@ -119,7 +121,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
                 """.split()
 
             run_command(self._launch_args + test_args, return_stdout=True)
-
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, "learned_embeds.safetensors")))
     def test_train_text_to_image(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             test_args = f"""
@@ -143,6 +145,8 @@ class ExamplesTestsAccelerate(unittest.TestCase):
 
             run_command(self._launch_args + test_args, return_stdout=True)
 
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, "unet", "diffusion_pytorch_model.safetensors")))
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, "scheduler", "scheduler_config.json")))
     def test_train_text_to_image_lora(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             test_args = f"""
@@ -165,6 +169,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
 
             run_command(self._launch_args + test_args, return_stdout=True)
 
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, "pytorch_lora_weights.safetensors")))
     def test_train_text_to_image_sdxl(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             test_args = f"""
@@ -193,7 +198,8 @@ class ExamplesTestsAccelerate(unittest.TestCase):
                 """.split()
 
             run_command(self._launch_args + test_args, return_stdout=True)
-
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, "unet", "diffusion_pytorch_model.safetensors")))
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, "scheduler", "scheduler_config.json")))
     def test_train_text_to_image_lora_sdxl(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             test_args = f"""
@@ -216,6 +222,10 @@ class ExamplesTestsAccelerate(unittest.TestCase):
                 """.split()
             run_command(self._launch_args + test_args, return_stdout=True)
 
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, "pytorch_lora_weights.safetensors")))
+            lora_state_dict = safetensors.torch.load_file(os.path.join(tmpdir, "pytorch_lora_weights.safetensors"))
+            is_lora = all("lora" in k for k in lora_state_dict.keys())
+            self.assertTrue(is_lora)
     def test_train_t2i_adapter_sdxl(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             test_args = f"""
@@ -235,7 +245,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
                 --output_dir {tmpdir}
                 """.split()
             run_command(self._launch_args + test_args, return_stdout=True)
-
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, "diffusion_pytorch_model.safetensors")))
     def test_train_instruct_pix2pix(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             test_args = f"""
@@ -261,6 +271,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
                 """.split()
             run_command(self._launch_args + test_args, return_stdout=True)
 
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, "diffusion_pytorch_model.safetensors")))
 
     def test_train_instruct_pix2pix_sdxl(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -288,6 +299,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
                 """.split()
             run_command(self._launch_args + test_args, return_stdout=True)
 
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, "diffusion_pytorch_model.safetensors")))
 
     def test_train_dreambooth(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -316,6 +328,8 @@ class ExamplesTestsAccelerate(unittest.TestCase):
                 """.split()
             run_command(self._launch_args + test_args, return_stdout=True)
 
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, "unet", "diffusion_pytorch_model.safetensors")))
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, "scheduler", "scheduler_config.json")))
     def test_train_dreambooth_lora(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             test_args = f"""
@@ -337,6 +351,8 @@ class ExamplesTestsAccelerate(unittest.TestCase):
                 --output_dir {tmpdir}
                 """.split()
             run_command(self._launch_args + test_args, return_stdout=True)
+
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, "pytorch_lora_weights.safetensors")))
 
     def test_train_dreambooth_lora_sdxl(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -361,6 +377,10 @@ class ExamplesTestsAccelerate(unittest.TestCase):
                 """.split()
             run_command(self._launch_args + test_args, return_stdout=True)
 
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, "pytorch_lora_weights.safetensors")))
+            lora_state_dict = safetensors.torch.load_file(os.path.join(tmpdir, "pytorch_lora_weights.safetensors"))
+            is_lora = all("lora" in k for k in lora_state_dict.keys())
+            self.assertTrue(is_lora)
 
     def test_train_custom_diffusion(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -388,6 +408,9 @@ class ExamplesTestsAccelerate(unittest.TestCase):
                 """.split()
             run_command(self._launch_args + test_args, return_stdout=True)
 
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, "pytorch_custom_diffusion_weights.bin")))
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, "<new1>.bin")))
+
     def test_train_controlnet(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             test_args = f"""
@@ -404,6 +427,8 @@ class ExamplesTestsAccelerate(unittest.TestCase):
                 --output_dir {tmpdir}
                 """.split()
             run_command(self._launch_args + test_args, return_stdout=True)
+
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, "diffusion_pytorch_model.safetensors")))
 
     def test_train_controlnet_sdxl(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -425,6 +450,8 @@ class ExamplesTestsAccelerate(unittest.TestCase):
                 --output_dir {tmpdir}
                 """.split()
             run_command(self._launch_args + test_args, return_stdout=True)
+
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, "diffusion_pytorch_model.safetensors")))
 
 
 if __name__ == '__main__':
