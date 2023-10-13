@@ -45,11 +45,9 @@ def run_command(command: List[str], return_stdout=False):
     if an error occurred while running `command`
     """
     try:
-        output = subprocess.check_output(command, stderr=subprocess.STDOUT)
-        if return_stdout:
-            if hasattr(output, "decode"):
-                output = output.decode("utf-8")
-            return output
+        p = subprocess.Popen(' '.join(command),stdout=subprocess.PIPE, bufsize=1, shell=True)
+        for line in iter(p.stdout.readline, b''):
+            print(line)
     except subprocess.CalledProcessError as e:
         raise SubprocessCallException(
             f"Command `{' '.join(command)}` failed with the following error:\n\n{e.output.decode()}"
@@ -61,6 +59,10 @@ logger.addHandler(stream_handler)
 
 
 class ExamplesTestsAccelerate(unittest.TestCase):
+
+    def __init__(self, *args, **kwargs):
+        super(ExamplesTestsAccelerate, self)._init__(*args, **kwargs)
+        self.pretrained_model_name = ''
 
     @classmethod
     def setUpClass(cls):
@@ -87,7 +89,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
                 --random_flip
                 --train_batch_size 10
                 --num_epochs 1
-                --gradient_accumulation_steps 1
+                --gradient_accumulation_steps 100
                 --use_ema
                 --learning_rate 1e-4
                 --lr_warmup_steps 5
@@ -104,7 +106,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
             test_args = f"""
                 textual_inversion/textual_inversion.py
                 --pretrained_model_name_or_path {pretrained_model_name}
-                --train_data_dir data/diffusers/cat_toy_example
+                --train_data_dir diffusers/cat_toy_example
                 --learnable_property "object"
                 --placeholder_token "<cat-toy>" 
                 --initializer_token "toy"
@@ -126,7 +128,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
             test_args = f"""
                 text_to_image/train_text_to_image.py
                 --pretrained_model_name_or_path {pretrained_model_name}
-                --dataset_name data/lambdalabs/pokemon-blip-captions
+                --dataset_name lambdalabs/pokemon-blip-captions
                 --use_ema
                 --resolution 512 
                 --center_crop 
@@ -151,7 +153,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
             test_args = f"""
                 text_to_image/train_text_to_image_lora.py
                 --pretrained_model_name_or_path {pretrained_model_name}
-                --dataset_name data/lambdalabs/pokemon-blip-captions
+                --dataset_name lambdalabs/pokemon-blip-captions
                 --caption_column "text"
                 --resolution 512 
                 --random_flip
@@ -174,8 +176,8 @@ class ExamplesTestsAccelerate(unittest.TestCase):
             test_args = f"""
                 text_to_image/train_text_to_image_sdxl.py
                 --pretrained_model_name_or_path {pretrained_model_name}
-                --pretrained_vae_model_name_or_path model_info/madebyollin/sdxl-vae-fp16-fix
-                --dataset_name data/lambdalabs/pokemon-blip-captions
+                --pretrained_vae_model_name_or_path madebyollin/sdxl-vae-fp16-fix
+                --dataset_name lambdalabs/pokemon-blip-captions
                 --enable_xformers_memory_efficient_attention
                 --resolution 512 
                 --center_crop 
@@ -204,7 +206,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
             test_args = f"""
                 text_to_image/train_text_to_image_lora_sdxl.py
                 --pretrained_model_name_or_path {pretrained_model_name}
-                --dataset_name data/lambdalabs/pokemon-blip-captions
+                --dataset_name lambdalabs/pokemon-blip-captions
                 --caption_column "text"
                 --resolution 1024
                 --random_flip
@@ -230,7 +232,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
             test_args = f"""
                 t2i_adapter/train_t2i_adapter_sdxl.py
                 --pretrained_model_name_or_path {pretrained_model_name}
-                --dataset_name data/fusing/fill50k
+                --dataset_name fusing/fill50k
                 --mixed_precision "fp16"
                 --resolution 1024
                 --learning_rate 1e-5
@@ -250,7 +252,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
             test_args = f"""
                 instruct_pix2pix/train_instruct_pix2pix.py
                 --pretrained_model_name_or_path {pretrained_model_name}
-                --dataset_name data/fusing/instructpix2pix-1000-samples
+                --dataset_name fusing/instructpix2pix-1000-samples
                 --use_ema
                 --enable_xformers_memory_efficient_attention
                 --resolution 512 
@@ -277,7 +279,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
             test_args = f"""
                 instruct_pix2pix/train_instruct_pix2pix_sdxl.py
                 --pretrained_model_name_or_path {pretrained_model_name}
-                --dataset_name data/fusing/instructpix2pix-1000-samples
+                --dataset_name fusing/instructpix2pix-1000-samples
                 --use_ema
                 --enable_xformers_memory_efficient_attention
                 --resolution 512 
@@ -305,7 +307,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
             test_args = f"""
                 dreambooth/train_dreambooth.py
                 --pretrained_model_name_or_path {pretrained_model_name}
-                --instance_data_dir data/diffusers/dog-example
+                --instance_data_dir diffusers/dog-example
                 --with_prior_preservation 
                 --prior_loss_weight 1.0
                 --instance_prompt "a photo of sks dog"
@@ -334,7 +336,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
             test_args = f"""
                 dreambooth/train_dreamboothl_lora.py
                 --pretrained_model_name_or_path {pretrained_model_name}
-                --instance_data_dir data/diffusers/dog-example
+                --instance_data_dir diffusers/dog-example
                 --instance_prompt "a photo of sks dog"
                 --resolution 512
                 --train_batch_size 1
@@ -358,8 +360,8 @@ class ExamplesTestsAccelerate(unittest.TestCase):
             test_args = f"""
                 dreambooth/train_dreambooth_lora_sdxl.py
                 --pretrained_model_name_or_path {pretrained_model_name}
-                --instance_data_dir data/diffusers/dog-example
-                --pretrained_vae_model_name_or_path model_info/madebyollin/sdxl-vae-fp16-fix
+                --instance_data_dir diffusers/dog-example
+                --pretrained_vae_model_name_or_path madebyollin/sdxl-vae-fp16-fix
                 --mixed_precision "fp16"
                 --instance_prompt "a photo of sks dog"
                 --resolution 1024
@@ -386,7 +388,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
             test_args = f"""
                 custom_diffusion/train_custom_diffusion.py
                 --pretrained_model_name_or_path {pretrained_model_name}
-                --instance_data_dir data/diffusers/cat_toy_example
+                --instance_data_dir diffusers/cat_toy_example
                 --class_data_dir ./real_reg/samples_cat/
                 --with_prior_preservation 
                 --real_prior
@@ -415,7 +417,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
             test_args = f"""
                 controlnet/train_controlnet.py
                 --pretrained_model_name_or_path {pretrained_model_name}
-                --dataset_name data/fusing/fill50k
+                --dataset_name fusing/fill50k
                 --resolution 512
                 --learning_rate 1e-5
                 --max_train_steps 10
@@ -434,8 +436,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
             test_args = f"""
                 controlnet/train_controlnet_sdxl.py
                 --pretrained_model_name_or_path {pretrained_model_name}
-                --output_dir=$OUTPUT_DIR
-                --dataset_name data/fusing/fill50k
+                --dataset_name fusing/fill50k
                 --mixed_precision "fp16"
                 --resolution 1024
                 --learning_rate 1e-5
