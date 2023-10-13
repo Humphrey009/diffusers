@@ -81,7 +81,8 @@ class ExamplesTestsAccelerate(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             test_args = f"""
                 unconditional_image_generation/train_unconditional.py
-                --dataset_name data/huggan/pokemon
+                --dataset_name data/huggan/flowers-102-categories
+                
                 --resolution=64 
                 --center_crop
                 --random_flip
@@ -102,7 +103,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
             test_args = f"""
                 textual_inversion/textual_inversion.py
                 --pretrained_model_name_or_path {pretrained_model_name}
-                --train_data_dir data/cat
+                --train_data_dir data/diffusers/cat_toy_example
                 --learnable_property "object"
                 --placeholder_token "<cat-toy>" 
                 --initializer_token "toy"
@@ -240,7 +241,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
             test_args = f"""
                 instruct_pix2pix/train_instruct_pix2pix.py
                 --pretrained_model_name_or_path {pretrained_model_name}
-                --dataset_name data/sayakpaul/instructpix2pix-1000-samples
+                --dataset_name data/fusing/instructpix2pix-1000-samples
                 --use_ema
                 --enable_xformers_memory_efficient_attention
                 --resolution 512 
@@ -293,7 +294,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
             test_args = f"""
                 dreambooth/train_dreambooth.py
                 --pretrained_model_name_or_path {pretrained_model_name}
-                --instance_data_dir data/dog
+                --instance_data_dir data/diffusers/dog-example
                 --with_prior_preservation 
                 --prior_loss_weight 1.0
                 --instance_prompt "a photo of sks dog"
@@ -320,7 +321,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
             test_args = f"""
                 dreambooth/train_dreamboothl_lora.py
                 --pretrained_model_name_or_path {pretrained_model_name}
-                --instance_data_dir data/dog
+                --instance_data_dir data/diffusers/dog-example
                 --instance_prompt "a photo of sks dog"
                 --resolution 512
                 --train_batch_size 1
@@ -342,7 +343,7 @@ class ExamplesTestsAccelerate(unittest.TestCase):
             test_args = f"""
                 dreambooth/train_dreambooth_lora_sdxl.py
                 --pretrained_model_name_or_path {pretrained_model_name}
-                --instance_data_dir data/dog
+                --instance_data_dir data/diffusers/dog-example
                 --pretrained_vae_model_name_or_path model_info/madebyollin/sdxl-vae-fp16-fix
                 --mixed_precision "fp16"
                 --instance_prompt "a photo of sks dog"
@@ -366,8 +367,8 @@ class ExamplesTestsAccelerate(unittest.TestCase):
             test_args = f"""
                 custom_diffusion/train_custom_diffusion.py
                 --pretrained_model_name_or_path {pretrained_model_name}
-                --instance_data_dir /data/cat
-                --class_data_dir data/real_reg/samples_cat/
+                --instance_data_dir data/diffusers/cat_toy_example
+                --class_data_dir ./real_reg/samples_cat/
                 --with_prior_preservation 
                 --real_prior
                 --prior_loss_weight 1.0
