@@ -1,0 +1,47 @@
+#!/bin/bash
+
+cur_path=`pwd`
+pretrained_model_name = ""
+pretrained_model_name_path = ""
+
+cur_path_last_dirname=${cur_path##*/}
+if [ x"${cur_path_last_dirname}" == x"scripts" ];then
+    scripts_path_dir=${cur_path}
+    cd ../
+    cur_path=`pwd`
+else
+    scripts_path_dir=${cur_path}/scripts
+fi
+
+#创建输出目录，不需要修改
+if [ -d ${scripts_path_dir}/output ];then
+    rm -rf ${scripts_path_dir}/output
+    mkdir -p ${scripts_path_dir}/output
+else
+    mkdir -p ${scripts_path_dir}/output
+fi
+
+# 启动训练脚本
+start_time=$(date +%s)
+#nohup python3 -m torch.distributed.run --nproc_per_node 8 unconditional_image_generation/train_unconditional.py \
+  nohup python3 unconditional_image_generation/train_unconditional.py \
+  --model_config_name_or_path ${pretrained_model_name} \
+  --dataset_name huggan/flowers-102-categories \
+  --resolution=64 \
+  --center_crop \
+  --random_flip \
+  --train_batch_size 10 \
+  --num_epochs 1 \
+  --gradient_accumulation_steps 100 \
+  --use_ema \
+  --learning_rate 1e-4 \
+  --lr_warmup_steps 5 \
+  --mixed_precision no \
+  --overwrite_output_dir \
+  --output_dir ./output > ${scripts_path_dir}/output/${pretrained_model_name_path}/train_unconditional.log 2>&1 &
+wait
+end_time=$(date +%s)
+e2e_time=$(( $end_time - $start_time ))
+
+# 打印端到端训练时间
+echo "E2E Training Duration sec : $e2e_time"
